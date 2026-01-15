@@ -1,0 +1,13 @@
+{
+    "name": "Go + Bazel",
+    "image": "mcr.microsoft.com/devcontainers/go:1.21",
+    "features": {
+      "ghcr.io/devcontainers-community/features/bazel:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": ["golang.go", "BazelBuild.vscode-bazel"]
+        }
+    },
+  "postCreateCommand": "bazel version && go version"
+}
