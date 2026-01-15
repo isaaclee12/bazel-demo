@@ -2,12 +2,12 @@ package stringutils
 
 import "strings"
 
-func Reverse(s string) string {
+func Reverse(s string, uppercase bool) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
 		runes[i], runes[j] = runes[j], runes[i]
 	}
-	return string(runes)
+	return ToUpperCase(string(runes))
 }
 
 func ToUpperCase(s string) string {

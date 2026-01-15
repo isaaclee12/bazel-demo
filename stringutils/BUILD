@@ -3,7 +3,8 @@ load("@rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name="stringutils",
     srcs=["stringutils.go"],
-    importpath = "bazel-demo/stringutils",
+    # importpath = "bazel-demo/stringutils",
+    importpath = "github.com/isaaclee12/bazel-demo/stringutils",
     visibility = ["//visibility:public"],
 )
 

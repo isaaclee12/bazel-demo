@@ -1,72 +1,134 @@
 # bazel-demo
 A demo for a simple of deployment of Bazel
 
-Game Plan: Bazel + DevContainers Learning Project (6-8 hours)
-
-Phase 1: Environment Setup (1 hour)
-You'll create the DevContainer configuration and get your IDE working inside the container. This 
-phase is about proving that you can open VSCode, have it detect the devcontainer config, rebuild the container, and land you in a fully-equipped Go and Bazel development environment. By the end, you should be able to run bazel version and go version from your integrated terminal without having installed either tool on your host machine.
-
-Phase 2: Hello World with Bazel (1-1.5 hours)
-You'll write the simplest possible Go program and create your first Bazel BUILD file to compile it. This teaches you the basic Bazel syntax and workflow. You'll learn what bazel build, bazel run, and bazel test do, and you'll see the output directories where Bazel stores artifacts. The goal here is demystifying what happens when you execute a Bazel command.
 
 
-Build and Run
+## Build and Run
+bazel build //:main
+bazel run //:main
 
- bazel build //:main
- bazel run //:main
- Explore bazel-bin/ output directory
-
-Verify
-
- Check that binary exists in bazel-bin/main_/main
- Run bazel clean and rebuild to see full build process
+## Verify Dependency Graph
+bazel query --output=label_kind "deps(//:main)"
 
 
-Phase 3: Dependency Graph (2 hours)
-This is where it gets interesting. You'll create two utility packages (let's call them stringutils and mathutils) and have your main service import both of them. You'll write BUILD files for each package, declaring the dependency relationships. Then you'll intentionally change one utility package and observe that Bazel only rebuilds what's affected. This is where the hashing and incremental build concepts click into place.
 
-Create Utility Packages
+## Bazel + DevContainers Learning Phases (Framework assisted by Claude)
 
- Create stringutils/ directory with stringutils.go
- Create stringutils/BUILD.bazel defining go_library
- Create mathutils/ directory with mathutils.go
- Create mathutils/BUILD.bazel defining go_library
+## Phase 1: Environment Setup
+Set up DevContainer with Go and Bazel for reproducible development environment.
 
-Update Main to Use Utils
+**Steps:**
+- [ ] Create `.devcontainer/` folder
+- [ ] Create `.devcontainer/devcontainer.json` with Go image + Bazel feature
+- [ ] Open folder in VSCode
+- [ ] Click "Reopen in Container" when prompted
+- [ ] Verify installation: `bazel version` and `go version`
 
- Modify main.go to import and call both utility packages
- Update root BUILD.bazel to declare dependencies on utils
+### Phase 2: Hello World with Bazel
+Build and run a simple Go program with Bazel to understand basic workflow.
 
-Build and Observe
+**Steps:**
+- [ ] Create `WORKSPACE.bazel` (empty file)
+- [ ] Create `MODULE.bazel` (declare module name and rules_go dependency)
+- [ ] Create `main.go` with Hello World program
+- [ ] Create `BUILD.bazel` with `go_binary` target
+- [ ] Run `bazel build //:main`
+- [ ] Run `bazel run //:main`
+- [ ] Explore `bazel-bin/` output directory
 
- Run bazel build //:main
- Check bazel-bin/ for all three targets
+### Phase 3: Dependency Graph
+Create utility packages and observe how Bazel manages dependencies.
 
-Test Incremental Builds
+**Steps:**
+- [ ] Create `stringutils/` with stringutils.go, BUILD.bazel, and tests
+- [ ] Create `mathutils/` with mathutils.go, BUILD.bazel, and tests
+- [ ] Update `main.go` to import both utility packages
+- [ ] Update root `BUILD.bazel` with `deps` attribute
+- [ ] Run `bazel build //:main`
+- [ ] Run `bazel query --output=label_kind "deps(//:main)"` to verify dependency graph
+- [ ] Observe all three targets in bazel-bin/
 
- Change a function in stringutils
- Rebuild, observe only affected targets rebuild
- Change mathutils, observe different rebuild pattern
+### Phase 4: Breaking and Observing
+Experiment with incremental builds and caching to understand Bazel's behavior.
 
-Verify Dependency Graph
- bazel query --output=graph //:main
- Run bazel query --output=graph //:main (optional, shows visual dependency graph)
+**Baseline Build:**
+- [ ] Run `bazel clean` to clear cache
+- [ ] Run `bazel build //:main` and note build time
+- [ ] Run `bazel build //:main` again (should be instant - cache hit)
 
-Ready for file structure and contents?
+**Break stringutils:**
+- [ ] Change `Reverse()` function signature to add a parameter
+- [ ] Try `bazel build //:main` (should fail - main.go doesn't match)
+- [ ] Fix main.go to match new signature
+- [ ] Rebuild with `-s` flag: `bazel build -s //:main`
+- [ ] Observe only stringutils + main recompile (not mathutils)
 
-Phase 4: Breaking and Observing (2-3 hours)
-This is the most valuable 
-phase for interview prep. You'll deliberately mess with things to see how Bazel responds. Change a function signature in stringutils and watch the build fail because the main service is now broken. Fix it and observe the rebuild. Add print statements to see which packages are actually recompiling. Check the Bazel cache directories to see the hashed artifacts. Run bazel clean and rebuild everything to compare the time difference. This hands-on experimentation will give you the intuition you need to talk confidently about build systems.
+**Break mathutils:**
+- [ ] Add new function `Subtract(a, b int) int` to mathutils.go
+- [ ] Rebuild without using it in main.go
+- [ ] Observe: mathutils rebuilds, but main doesn't (unused dependency change)
 
-Phase 5: Testing Integration (1 hour)
-You'll add unit tests to each package and configure Bazel to run them. This shows you how testing fits into the build graph. You'll see that changing a test file doesn't trigger a rebuild of the actual code, which demonstrates Bazel's understanding of the dependency direction.
+**Inspect Cache:**
+- [ ] Check `bazel-bin/` for binary timestamps
+- [ ] Run `bazel clean` vs `bazel clean --expunge` (compare what gets deleted)
+- [ ] Use `--explain=log.txt` to see what changed between builds
+
+**Test Selective Rebuilds:**
+- [ ] Modify a test file (e.g., stringutils_test.go)
+- [ ] Run `bazel build //:main`
+- [ ] Observe: tests don't trigger main rebuild (separate dependency path)
 
 
-Optional
 
-Phase 6: Remote Cache Setup (if time permits)
-If you finish early and want to push further, we can set up a local remote cache server and configure Bazel to use it. This would let you experience the "cache hit from a remote source" workflow that happens at DoorDash scale.
-Does this progression make sense? The key is that each 
-phase builds on the previous one, and by 
-Phase 4 you're not following instructions anymore—you're experimenting and discovering how the system behaves. That's what will make the concepts stick and give you real stories to tell in the interview.
+## Phase 5: API Features & Testing Integration
+Create a REST API to simulate a DoorDash backend service. Add comprehensive tests and see how Bazel handles test targets separately from build targets.
+
+**Create API Package:**
+- [ ] Create `api/` directory with `api.go` and `BUILD.bazel`
+- [ ] Implement REST handlers: `GET /health`, `POST /calculate` (uses mathutils), `POST /transform` (uses stringutils)
+- [ ] Add `net/http` server logic
+- [ ] Define `go_library` target for API package
+
+**Update Main Binary:**
+- [ ] Modify `main.go` to start HTTP server using api package
+- [ ] Update root `BUILD.bazel` to depend on `//api`
+- [ ] Run `bazel run //:main` and test endpoints with curl
+
+**Add API Tests:**
+- [ ] Create `api/api_test.go` with HTTP handler tests
+- [ ] Define `go_test` target in `api/BUILD.bazel`
+- [ ] Run `bazel test //api:api_test`
+
+**Test All Packages:**
+- [ ] Run `bazel test //...` to execute all tests in project
+- [ ] Check `bazel-testlogs/` for detailed test outputs
+- [ ] Verify test results in terminal output
+
+**Observe Test/Build Separation:**
+- [ ] Modify `stringutils_test.go` (change expected value)
+- [ ] Run `bazel build //:main` - observe no rebuild triggered
+- [ ] Run `bazel test //stringutils:stringutils_test` - only test runs
+- [ ] Fix test, modify `stringutils.go` function
+- [ ] Run `bazel test //stringutils:stringutils_test` - observe both code and test rebuild
+
+**Test Dependency Impact:**
+- [ ] Break a function in `mathutils.go`
+- [ ] Run `bazel test //...` 
+- [ ] Observe: mathutils tests fail, API tests fail (uses mathutils), stringutils tests pass
+- [ ] Fix function, rerun tests, verify cascading success
+
+Optional (if time permits)
+
+Phase 6: Remote Cache Setup
+
+Phase 7: Understanding Gazelle
+
+
+
+## Key Concepts Learned
+
+Hermetic builds: Bazel sandboxes build actions with only declared inputs
+Content hashing: Dependencies tracked by file content, not timestamps
+Incremental builds: Only affected targets rebuild when dependencies change
+Remote caching: Build artifacts can be shared across machines
+Dependency graphs: Explicit declaration of all dependencies in BUILD files

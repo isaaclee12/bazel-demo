@@ -3,7 +3,8 @@ load("@rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name="mathutils",
     srcs=["mathutils.go"],
-    importpath = "bazel-demo/mathutils",
+    # importpath = "bazel-demo/mathutils",
+    importpath = "github.com/isaaclee12/bazel-demo/mathutils",
     visibility = ["//visibility:public"],
 )
 
