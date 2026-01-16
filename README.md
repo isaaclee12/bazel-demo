@@ -1,18 +1,14 @@
 # bazel-demo
-A demo for a simple of deployment of Bazel
-
+A demo for a simple of deployment of Bazel, as learning practice.
 
 
 ## Build and Run
+```
 bazel build //:main
 bazel run //:main
+```
 
-## Verify Dependency Graph
-bazel query --output=label_kind "deps(//:main)"
-
-
-
-## Bazel + DevContainers Learning Phases (Framework assisted by Claude)
+# Learning Phases
 
 ## Phase 1: Environment Setup
 Set up DevContainer with Go and Bazel for reproducible development environment.
@@ -80,6 +76,8 @@ Experiment with incremental builds and caching to understand Bazel's behavior.
 
 
 
+# Optional Milestones (if time permits)
+
 ## Phase 5: API Features & Testing Integration
 Create a REST API to simulate a DoorDash backend service. Add comprehensive tests and see how Bazel handles test targets separately from build targets.
 
@@ -117,18 +115,6 @@ Create a REST API to simulate a DoorDash backend service. Add comprehensive test
 - [ ] Observe: mathutils tests fail, API tests fail (uses mathutils), stringutils tests pass
 - [ ] Fix function, rerun tests, verify cascading success
 
-Optional (if time permits)
-
 Phase 6: Remote Cache Setup
 
 Phase 7: Understanding Gazelle
-
-
-
-## Key Concepts Learned
-
-Hermetic builds: Bazel sandboxes build actions with only declared inputs
-Content hashing: Dependencies tracked by file content, not timestamps
-Incremental builds: Only affected targets rebuild when dependencies change
-Remote caching: Build artifacts can be shared across machines
-Dependency graphs: Explicit declaration of all dependencies in BUILD files
